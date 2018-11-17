@@ -1,5 +1,5 @@
-import { asyncRouterMap, constantRouterMap } from '@/router'
-
+import { asyncRouterMap, constantRouterMap, allRouterMap } from '@/router'
+import { getMenu } from '@/api/permission'
 /**
  * 通过meta.role判断是否与当前用户权限匹配
  * @param roles
@@ -27,10 +27,39 @@ function filterAsyncRouter(routes, roles) {
       if (tmp.children) {
         tmp.children = filterAsyncRouter(tmp.children, roles)
       }
+      if (tmp.path === '/system') {
+        const data = '1234224123412'
+        let menus = 1
+        getMenu(data).then(response => {
+          console.log(response.data)
+          menus = response.data
+
+          const data2 = menus[0].id
+          console.log(data2)
+          getMenu(data2).then(response => {
+            console.log(response.data)
+          })
+        })
+        const menu = {}
+        let pat = ''
+        console.log(menus)
+        for (var i = 0; i < menus.length; i++) {
+          if (menu.id === '1000000000000000001') {
+            pat = menu.component
+          }
+        }
+        console.log(tmp.children[0].component)
+        menu.meta = { title: 'person' }
+        menu.component = () => import('@/views/' + pat)
+        menu.component = allRouterMap[0].component
+        menu.path = 'person'
+        tmp.children.push(menu)
+        console.log(menu.component)
+        console.log(tmp.children)
+      }
       res.push(tmp)
     }
   })
-
   return res
 }
 
@@ -50,7 +79,7 @@ const permission = {
       return new Promise(resolve => {
         const { roles } = data
         let accessedRouters
-        if (roles.includes('admin')) {
+        if (roles.includes('admins')) {
           accessedRouters = asyncRouterMap
         } else {
           accessedRouters = filterAsyncRouter(asyncRouterMap, roles)

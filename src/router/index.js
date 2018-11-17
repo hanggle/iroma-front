@@ -23,22 +23,23 @@ import Layout from '../views/layout/Layout'
 **/
 export const constantRouterMap = [
   { path: '/login', component: () => import('@/views/login/index'), hidden: true },
-  { path: '/404', component: () => import('@/views/404'), hidden: true },
-
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/dashboard',
-    name: 'Dashboard',
-    hidden: true,
-    children: [{
-      path: 'dashboard',
-      component: () => import('@/views/dashboard/index')
-    }]
-  }
+  { path: '/404', component: () => import('@/views/404'), hidden: true }
 ]
 
 export const asyncRouterMap = [
+  {
+    path: '',
+    component: Layout,
+    redirect: 'dashboard',
+    children: [
+      {
+        path: 'dashboard',
+        component: () => import('@/views/dashboard/index'),
+        name: 'Dashboard',
+        meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
+      }
+    ]
+  },
   {
     path: '/example',
     component: Layout,
@@ -70,6 +71,24 @@ export const asyncRouterMap = [
         name: 'Form',
         component: () => import('@/views/form/index'),
         meta: { title: 'Form', icon: 'form' }
+      }
+    ]
+  },
+
+  {
+    path: '/system',
+    component: Layout,
+    redirect: '/system/menu',
+    name: 'System',
+    meta: {
+      title: 'system',
+      icon: 'nested'
+    },
+    children: [
+      {
+        path: 'menu1',
+        component: () => import('@/views/iroma/system/menu/index'),
+        meta: { title: 'menu1' }
       }
     ]
   },
@@ -146,8 +165,11 @@ export const asyncRouterMap = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
+export const allRouterMap = [
+  { id: '1000000000000000017', component: () => import('@/views/iroma/system/person/index'), hidden: true }
+]
 export default new Router({
-  // mode: 'history', //后端支持可开
+  // mode: 'history', // 后端支持可开
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 })
