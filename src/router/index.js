@@ -23,20 +23,25 @@ import Layout from '../views/layout/Layout'
 **/
 export const constantRouterMap = [
   { path: '/login', component: () => import('@/views/login/index'), hidden: true },
-  { path: '/404', component: () => import('@/views/404'), hidden: true },
+  { path: '/404', component: () => import('@/views/404'), hidden: true }
+]
 
+export const asyncRouterMap = [
+  /*
   {
-    path: '/',
+    path: '',
     component: Layout,
-    redirect: '/dashboard',
-    name: 'Dashboard',
-    hidden: true,
-    children: [{
-      path: 'dashboard',
-      component: () => import('@/views/dashboard/index')
-    }]
+    redirect: 'dashboard',
+    children: [
+      {
+        path: 'dashboard',
+        component: () => import('@/views/dashboard/index'),
+        name: 'Dashboard',
+        meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
+      }
+    ]
   },
-
+  */
   {
     path: '/example',
     component: Layout,
@@ -54,7 +59,7 @@ export const constantRouterMap = [
         path: 'tree',
         name: 'Tree',
         component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        meta: { title: 'Tree', icon: 'tree', roles: ['admin'] }
       }
     ]
   },
@@ -71,7 +76,6 @@ export const constantRouterMap = [
       }
     ]
   },
-
   {
     path: '/nested',
     component: Layout,
@@ -144,8 +148,14 @@ export const constantRouterMap = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
+export const allRouterMap = [
+  { id: '1000000000000000019', component: () => import('@/views/iroma/dashboard/index'), hidden: true },
+  { id: '1000000000000000016', component: () => import('@/views/iroma/system/person/index'), hidden: true },
+  { id: '1000000000000000017', component: () => import('@/views/iroma/system/menu/index'), hidden: true },
+  { id: '1000000000000000010', component: () => import('@/views/iroma/frame/svg-icons/index'), hidden: true }
+]
 export default new Router({
-  // mode: 'history', //后端支持可开
+  // mode: 'history', // 后端支持可开
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 })
