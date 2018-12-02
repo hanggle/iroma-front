@@ -4,7 +4,6 @@
       <el-col :xs="24" :sm="24" :lg="5">
         <div >
           <el-input v-model="filterText" placeholder="Filter keyword" style="margin-bottom:30px;width:80%;" />
-
           <el-tree
             ref="tree2"
             :data="data2"
@@ -16,9 +15,14 @@
           />
         </div>
       </el-col>
-      <el-col :xs="24" :sm="24" :lg="19">
+      <el-col :xs="24" :sm="24" :lg="18">
         <div class="app-container">
           <el-form ref="form" :model="form" label-width="120px">
+            <el-form-item label="title">
+              <el-col :span="12">
+                <el-input v-model="form.title"/>
+              </el-col>
+            </el-form-item>
             <el-form-item label="菜单名称">
               <el-col :span="12">
                 <el-input v-model="form.name"/>
@@ -36,8 +40,8 @@
             </el-form-item>
             <el-form-item label="上级菜单">
               <el-col :span="12">
-                <el-select v-model="form.parantId" placeholder="please select your zone">
-                  <el-option v-for="item in menuList" :key="item.value" :label="item.label" :value="item.value"/>
+                <el-select v-model="form.parentId" placeholder="please select your zone">
+                  <el-option v-for="item in menuList" :key="item.id" :label="item.label" :value="item.value"/>
                 </el-select>
               </el-col>
             </el-form-item>
@@ -51,18 +55,15 @@
                 <el-input v-model="form.icon"/>
               </el-col>
             </el-form-item>
-            <el-form-item label="title">
-              <el-col :span="12">
-                <el-input v-model="form.title"/>
-              </el-col>
-            </el-form-item>
             <el-form-item label="描述">
               <el-col :span="12">
                 <el-input v-model="form.desc" type="textarea"/>
               </el-col>
             </el-form-item>
             <el-form-item>
+              <el-button type="primary" icon="el-icon-edit" @click="onCreate">新增</el-button>
               <el-button type="primary" @click="onSubmit">保存</el-button>
+              <el-button type="primary" icon="el-icon-delete" @click="onDelete">删除</el-button>
               <el-button @click="onCancel">取消</el-button>
             </el-form-item>
           </el-form>
@@ -74,70 +75,29 @@
 
 <script>
 import request from '@/utils/request'
+
+const defaultForm = {
+  id: '',
+  name: '',
+  path: '',
+  parentId: '',
+  orderCode: '',
+  title: '',
+  desc: '',
+  icon: ''
+}
 export default {
 
   data() {
     return {
       filterText: '',
-      data2: [{
-        id: 1,
-        label: 'Level one 1',
-        children: [{
-          id: 4,
-          label: 'Level two 1-1',
-          children: [{
-            id: 9,
-            label: 'Level three 1-1-1'
-          }, {
-            id: 10,
-            label: 'Level three 1-1-2'
-          }]
-        }]
-      }, {
-        id: 2,
-        label: 'Level one 2',
-        children: [{
-          id: 5,
-          label: 'Level two 2-1'
-        }, {
-          id: 6,
-          label: 'Level two 2-2'
-        }]
-      }, {
-        id: 3,
-        label: 'Level one 3',
-        children: [{
-          id: 7,
-          label: 'Level two 3-1'
-        }, {
-          id: 8,
-          label: 'Level two 3-2'
-        }]
-      }],
-      form: {
-        id: '',
-        name: '',
-        path: '',
-        parantId: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
-      },
+      data2: [],
+      form: Object.assign({}, defaultForm),
       defaultProps: {
         children: 'children',
         label: 'label'
       },
-      menuList: [{
-        label: 'Zone 1',
-        value: 'shanghai',
-        level: 1
-      }, {
-        label: 'Zone 2',
-        value: 'shanghai2',
-        level: 2
-      }]
+      menuList: []
     }
   },
   watch: {
@@ -146,7 +106,8 @@ export default {
     }
   },
   created() {
-    initMenuTree()
+    this.initMenuTree()
+    this.loadMenuSelect()
   },
   methods: {
     filterNode(value, data) {
@@ -154,36 +115,74 @@ export default {
       return data.label.indexOf(value) !== -1
     },
     handleNodeClick(data) {
-      console.log(data)
+      request({
+        url: '/api/menu/get',
+        method: 'get',
+        params: { id: data.id }
+      }).then(response => {
+        const result = response.data
+        this.form.id = result.id
+        this.form.name = result.name
+        this.form.path = result.path
+        this.form.title = result.title
+        this.form.parentId = result.parentId
+        this.form.orderCode = result.orderCode
+        this.form.desc = result.description
+        this.form.icon = result.icon
+      })
+    },
+    onCreate() {
+      this.form = Object.assign({}, defaultForm)
     },
     onSubmit() {
-      this.$message('submit!')
+      const data = {
+        id: this.form.id,
+        name: this.form.name
+      }
+      console.log(data)
+      request({
+        url: '/api/menu/insert',
+        method: 'post',
+        data: this.form
+      }).then(response => {
+        if (response.data) {
+          this.$message('submit!')
+        }
+      })
+    },
+    onDelete() {
+      this.$message('delete!')
     },
     onCancel() {
       this.$message({
         message: 'cancel!',
         type: 'warning'
       })
+    },
+    initMenuTree() {
+    // console.log(query)
+      request({
+        url: '/api/menu/menuTree',
+        method: 'get',
+        data: {}
+      }).then(response => {
+        this.data2.push(response.data)
+      })
+    },
+    loadMenuSelect() {
+      request({
+        url: '/api/menu/menuSelect',
+        method: 'get',
+        data: {}
+      }).then(response => {
+        const data = response.data
+        data.forEach(item => {
+          this.menuList.push(item)
+        })
+        console.log(this.menuList)
+      })
     }
   }
-}
-function initMenuTree() {
-  const query = {
-    queryType: 1
-  }
-  const data = getMenuList(query)
-  console.log(data)
-}
-function getMenuList(query) {
-  // console.log(query)
-  request({
-    url: '/api/menu/list',
-    method: 'post',
-    data: query
-  }).then(response => {
-    console.log(response.data)
-    return response.data
-  })
 }
 </script>
 

@@ -1,66 +1,77 @@
 import { asyncRouterMap, constantRouterMap, allRouterMap } from '@/router'
 import { getMenu } from '@/api/permission'
+/* Layout */
+import Layout from '@/views/layout/Layout'
+
 /**
- * 通过meta.role判断是否与当前用户权限匹配
+ * 动态加载菜单
  * @param roles
  * @param route
  */
-function hasPermission(roles, route) {
-  if (route.meta && route.meta.roles) {
-    return roles.some(role => route.meta.roles.includes(role))
-  } else {
-    return true
-  }
-}
-
-/**
- * 递归过滤异步路由表，返回符合用户角色权限的路由表
- * @param routes asyncRouterMap
- * @param roles
- */
-function filterAsyncRouter(routes, roles) {
-  const res = []
-
-  routes.forEach(route => {
-    const tmp = { ...route }
-    if (hasPermission(roles, tmp)) {
-      if (tmp.children) {
-        tmp.children = filterAsyncRouter(tmp.children, roles)
-      }
-      if (tmp.path === '/system') {
-        const data = '1234224123412'
-        let menus = 1
-        getMenu(data).then(response => {
-          console.log(response.data)
-          menus = response.data
-
-          const data2 = menus[0].id
-          console.log(data2)
-          getMenu(data2).then(response => {
-            console.log(response.data)
-          })
-        })
-        const menu = {}
-        let pat = ''
-        console.log(menus)
-        for (var i = 0; i < menus.length; i++) {
-          if (menu.id === '1000000000000000001') {
-            pat = menu.component
+function loadMenu(asyncRouterMap, menus) {
+  asyncRouterMap = []
+  if (menus) {
+    // 一级菜单
+    for (let i = 0; i < menus.length; i++) {
+      const oneLevel = menus[i]
+      if (oneLevel.level === 1) {
+        const oneMenu = {}
+        const oneMeta = {}
+        const oneChild = []
+        oneMenu.path = oneLevel.path
+        oneMenu.component = Layout
+        oneMenu.name = oneLevel.name
+        oneMeta.title = oneLevel.title
+        oneMeta.icon = oneLevel.icon
+        oneMenu.meta = oneMeta
+        // 二级菜单
+        for (let j = 0; j < menus.length; j++) {
+          const twoLevel = menus[j]
+          if (twoLevel.parentId === oneLevel.id) {
+            const twoMenu = {}
+            const twoMeta = {}
+            const twoChild = []
+            twoMenu.path = twoLevel.path
+            twoMenu.name = twoLevel.name
+            twoMeta.title = twoLevel.title
+            twoMeta.icon = twoLevel.icon
+            twoMenu.meta = twoMeta
+            allRouterMap.forEach(route => {
+              if (route.id === twoLevel.id) {
+                twoMenu.component = route.component
+              }
+            })
+            // 三级菜单
+            for (let z = 0; z < menus.length; z++) {
+              const threeLevel = menus[z]
+              if (threeLevel.parentId === twoLevel.id) {
+                const threeMenu = {}
+                const threeMeta = {}
+                threeMenu.path = threeLevel.path
+                threeMenu.name = threeLevel.name
+                threeMeta.title = threeLevel.title
+                threeMeta.icon = threeLevel.icon
+                threeMenu.meta = threeMeta
+                allRouterMap.forEach(route => {
+                  if (route.id === threeLevel.id) {
+                    threeMenu.component = route.component
+                  }
+                })
+                twoChild.push(threeMenu)
+              }
+            }
+            if (twoChild.length > 0) {
+              twoMenu.children = twoChild
+            }
+            oneChild.push(twoMenu)
           }
         }
-        console.log(tmp.children[0].component)
-        menu.meta = { title: 'person' }
-        menu.component = () => import('@/views/' + pat)
-        menu.component = allRouterMap[0].component
-        menu.path = 'person'
-        tmp.children.push(menu)
-        console.log(menu.component)
-        console.log(tmp.children)
+        oneMenu.children = oneChild
+        asyncRouterMap.push(oneMenu)
       }
-      res.push(tmp)
     }
-  })
-  return res
+  }
+  return asyncRouterMap
 }
 
 const permission = {
@@ -76,16 +87,15 @@ const permission = {
   },
   actions: {
     GenerateRoutes({ commit }, data) {
-      return new Promise(resolve => {
-        const { roles } = data
+      return new Promise((resolve, reject) => {
         let accessedRouters
-        if (roles.includes('admins')) {
-          accessedRouters = asyncRouterMap
-        } else {
-          accessedRouters = filterAsyncRouter(asyncRouterMap, roles)
-        }
-        commit('SET_ROUTERS', accessedRouters)
-        resolve()
+        getMenu(data.id).then(response => {
+          accessedRouters = loadMenu(asyncRouterMap, response.data)
+          commit('SET_ROUTERS', accessedRouters)
+          resolve(response)
+        }).catch(error => {
+          reject(error)
+        })
       })
     }
   }

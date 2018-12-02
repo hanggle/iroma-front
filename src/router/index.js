@@ -27,6 +27,7 @@ export const constantRouterMap = [
 ]
 
 export const asyncRouterMap = [
+  /*
   {
     path: '',
     component: Layout,
@@ -40,6 +41,7 @@ export const asyncRouterMap = [
       }
     ]
   },
+  */
   {
     path: '/example',
     component: Layout,
@@ -74,25 +76,6 @@ export const asyncRouterMap = [
       }
     ]
   },
-
-  {
-    path: '/system',
-    component: Layout,
-    redirect: '/system/menu',
-    name: 'System',
-    meta: {
-      title: 'system',
-      icon: 'nested'
-    },
-    children: [
-      {
-        path: 'menu1',
-        component: () => import('@/views/iroma/system/menu/index'),
-        meta: { title: 'menu1' }
-      }
-    ]
-  },
-
   {
     path: '/nested',
     component: Layout,
@@ -166,7 +149,10 @@ export const asyncRouterMap = [
 ]
 
 export const allRouterMap = [
-  { id: '1000000000000000017', component: () => import('@/views/iroma/system/person/index'), hidden: true }
+  { id: '1000000000000000019', component: () => import('@/views/iroma/dashboard/index'), hidden: true },
+  { id: '1000000000000000016', component: () => import('@/views/iroma/system/person/index'), hidden: true },
+  { id: '1000000000000000017', component: () => import('@/views/iroma/system/menu/index'), hidden: true },
+  { id: '1000000000000000010', component: () => import('@/views/iroma/frame/svg-icons/index'), hidden: true }
 ]
 export default new Router({
   // mode: 'history', // 后端支持可开
