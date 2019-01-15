@@ -75,6 +75,7 @@
 
 <script>
 import request from '@/utils/request'
+import * as msg from '@/utils/message'
 
 const defaultForm = {
   id: '',
@@ -135,32 +136,31 @@ export default {
       this.form = Object.assign({}, defaultForm)
     },
     onSubmit() {
-      const data = {
-        id: this.form.id,
-        name: this.form.name
-      }
-      console.log(data)
       request({
         url: '/api/menu/insert',
         method: 'post',
         data: this.form
       }).then(response => {
-        if (response.data) {
-          this.$message('submit!')
+        if (response.success) {
+          this.$message({
+            message: '操作成功',
+            type: 'success'
+          })
+          this.menuList = []
+          console.log(this.menuList)
+          this.initMenuTree()
         }
       })
     },
     onDelete() {
-      this.$message('delete!')
+      this.successMsg()
+      msg.successMsg()
     },
     onCancel() {
-      this.$message({
-        message: 'cancel!',
-        type: 'warning'
-      })
+      this.form = Object.assign({}, defaultForm)
+      msg.cancelMsg()
     },
     initMenuTree() {
-    // console.log(query)
       request({
         url: '/api/menu/menuTree',
         method: 'get',
@@ -179,7 +179,6 @@ export default {
         data.forEach(item => {
           this.menuList.push(item)
         })
-        console.log(this.menuList)
       })
     }
   }

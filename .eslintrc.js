@@ -58,7 +58,7 @@ module.exports = {
       'beforeColon': false,
       'afterColon': true
     }],
-    'keyword-spacing': [2, {
+    'keyword-spacing': [0, {
       'before': true,
       'after': true
     }],
@@ -93,7 +93,7 @@ module.exports = {
     'no-implied-eval': 2,
     'no-inner-declarations': [2, 'functions'],
     'no-invalid-regexp': 2,
-    'no-irregular-whitespace': 2,
+    'no-irregular-whitespace': 0,
     'no-iterator': 2,
     'no-label-var': 2,
     'no-labels': [2, {
@@ -168,7 +168,7 @@ module.exports = {
       'before': false,
       'after': true
     }],
-    'space-before-blocks': [2, 'always'],
+    'space-before-blocks': [0, 'always'],
     'space-before-function-paren': [2, 'never'],
     'space-in-parens': [2, 'never'],
     'space-infix-ops': 2,
