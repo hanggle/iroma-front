@@ -149,12 +149,12 @@ export const asyncRouterMap = [
 ]
 
 export const allRouterMap = [
-  { id: '1000000000000000019', component: () => import('@/views/iroma/dashboard/index'), hidden: true },
-  { id: '1000000000000000016', component: () => import('@/views/iroma/system/person/index'), hidden: true },
-  { id: '1000000000000000017', component: () => import('@/views/iroma/system/menu/index'), hidden: true },
-  { id: '1000000000000000010', component: () => import('@/views/iroma/frame/svg-icons/index'), hidden: true },
-  { id: '1000000000000000012', component: () => import('@/views/iroma/frame/table/complexTable.vue'), hidden: true },
-  { id: '1076160673110556673', component: () => import('@/views/iroma/system/person/personList.vue'), hidden: true }
+  { id: '1000000000000000019', component: () => import('@/views/roma/dashboard/index'), hidden: true },
+  { id: '1000000000000000016', component: () => import('@/views/roma/system/person/index'), hidden: true },
+  { id: '1000000000000000017', component: () => import('@/views/roma/system/menu/index'), hidden: true },
+  { id: '1000000000000000010', component: () => import('@/views/roma/frame/svg-icons/index'), hidden: true },
+  { id: '1000000000000000012', component: () => import('@/views/roma/frame/table/complexTable.vue'), hidden: true },
+  { id: '1076160673110556673', component: () => import('@/views/roma/system/person/personList.vue'), hidden: true }
 ]
 export default new Router({
   // mode: 'history', // 后端支持可开
